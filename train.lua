@@ -36,15 +36,14 @@ if false then
     criterion = nn.BatchTableCriterion(tmpCri)
 
     optim_state = {
-        learningRate = 0.01,
-        learningRateDecay = 1e-5,
-        momentum = 0.5
+        learningRate = 0.001,
+        learningRateDecay = 1e-5
     }
 
     trainer = nn.MultiGPUTrainer(smodel, criterion, optim.sgd, optim_state, gpuTable)
-    trainer:train(batch_dataset, 1000)
+    trainer:train(batch_dataset, 100)
 else
-    cutorch.setDevice(6)
+    cutorch.setDevice(5)
     dataset = pnn.recursiveCuda(dataset)
     function dataset:size() return #dataset end
 
@@ -56,7 +55,8 @@ else
     trainer = nn.StochasticGradient(model, criterion)
 
     trainer.learningRate = 0.01
-    trainer.maxIteration = 25
+    trainer.learningRateDecay = 0.0001
+    trainer.maxIteration = 100
     trainer:train(dataset)
     torch.saveobj('nobatch_model', model)
 end

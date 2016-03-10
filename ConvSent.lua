@@ -4,7 +4,7 @@ params = {
     INPUT_CH = 1,
     WORD_VEC_SIZE = 300,
     NUM_PER_KERNEL = 100,
-    KERNEL_SIZE = {2,3,4,5},
+    KERNEL_SIZE = {2,3,4,5,6},
     CLASS_HIDDEN = 200,
     CLASS_NUM = 50
 }

@@ -5,7 +5,7 @@ require 'pnn'
 
 cutorch.setDevice(1)
 
-dataset = torch.load('./test_dataset')
+dataset = torch.load('./train_dataset')
 
 for i = 1,#dataset do
     local size = dataset[i][1][1]:size()
@@ -19,7 +19,7 @@ for i = 1,#dataset do
 end
 dataset = pnn.recursiveCuda(dataset)
 
-if true then
+if false then
     model = torch.loadobj('model')
     model = model.module
 else
