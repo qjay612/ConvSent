@@ -3,7 +3,7 @@ dofile('ConvSent.lua')
 require 'cutorch'
 require 'pnn'
 
-cutorch.setDevice(5)
+cutorch.setDevice(1)
 
 dataset = torch.load('./test_dataset')
 
@@ -19,8 +19,12 @@ for i = 1,#dataset do
 end
 dataset = pnn.recursiveCuda(dataset)
 
-model = torch.loadobj('model')
-model = model.module
+if true then
+    model = torch.loadobj('model')
+    model = model.module
+else
+    model = torch.loadobj('nobatch_model')
+end
 model:evaluate()
 model:cuda()
 
@@ -30,13 +34,13 @@ for i = 1,#dataset do
     output = model:forward(dataset[i][1])
     maxIndex = 0
     maxValue = -1
-    for j = 1,output:size()[2] do
-        if output[1][j] > maxValue then
-            maxValue = output[1][j]
+    for j = 1,output:size()[1] do
+        if output[j] > maxValue then
+            maxValue = output[j]
             maxIndex = j
         end
     end
-    print(maxIndex, dataset[i][2], output[1][dataset[i][2]])
+    print(maxIndex, dataset[i][2], output[dataset[i][2]])
     if maxIndex == dataset[i][2] then
         correctNum = correctNum + 1
     end
