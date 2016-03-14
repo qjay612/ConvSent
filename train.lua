@@ -26,37 +26,15 @@ for i = 1,#dataList do
     dataList[i] = 50 / dataList[i]
 end
 
-if false then
-    batch_dataset = nn.pnn.datasetBatch(dataset, 8)
+model:training()
+criterion = nn.CrossEntropyCriterion(torch.Tensor(dataList))
+criterion.sizeAverage = false
 
-    gpuTable = {1,2,3,4}
-    smodel = nn.BatchTable(model)
-    tmpCri = nn.CrossEntropyCriterion(torch.Tensor(dataList))
-    tmpCri.nll.sizeAverage = false
-    criterion = nn.BatchTableCriterion(tmpCri)
-
-    optim_state = {
-        learningRate = 0.001,
-        learningRateDecay = 1e-5
-    }
-
-    trainer = nn.MultiGPUTrainer(smodel, criterion, optim.sgd, optim_state, gpuTable)
-    trainer:train(batch_dataset, 100)
-else
-    cutorch.setDevice(5)
-    dataset = pnn.recursiveCuda(dataset)
-    function dataset:size() return #dataset end
-
-    model:cuda()
-    criterion = nn.CrossEntropyCriterion(torch.Tensor(dataList))
-    criterion.sizeAverage = false
-    criterion:cuda()
-
-    trainer = nn.StochasticGradient(model, criterion)
-
-    trainer.learningRate = 0.01
-    trainer.learningRateDecay = 0.0001
-    trainer.maxIteration = 100
-    trainer:train(dataset)
-    torch.saveobj('nobatch_model', model)
-end
+local state = {
+    learningRate = 0.01,
+    learningRateDecay = 0.0002,
+    momentum = 0.9,
+    wd = 16
+}
+local trainer = nn.MultiGPUTrainer(model, criterion, optim.sgd, state, {1,2})
+trainer:train(dataset, 50, 50)

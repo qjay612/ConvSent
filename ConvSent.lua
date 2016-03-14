@@ -4,7 +4,7 @@ params = {
     INPUT_CH = 1,
     WORD_VEC_SIZE = 300,
     NUM_PER_KERNEL = 100,
-    KERNEL_SIZE = {2,3,4,5,6},
+    KERNEL_SIZE = {3,4,5},
     CLASS_HIDDEN = 200,
     CLASS_NUM = 50
 }
@@ -22,6 +22,7 @@ for k,v in ipairs(params.KERNEL_SIZE) do
                     v
                 )
             )
+            :add(nn.ReLU())
             :add(nn.Max(2))
             :add(nn.Reshape(NUM_PER_KERNEL))
     )
@@ -32,6 +33,7 @@ model = nn.Sequential()
     :add(nn.JoinTable(1))
     :add(nn.Dropout())
     :add(nn.Linear(#params.KERNEL_SIZE * params.NUM_PER_KERNEL, params.CLASS_HIDDEN))
-    :add(nn.Tanh())
+    :add(nn.ReLU())
+    :add(nn.Dropout())
     :add(nn.Linear(params.CLASS_HIDDEN, params.CLASS_NUM))
-    :add(nn.Tanh())
+    :add(nn.ReLU())
